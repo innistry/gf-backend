@@ -17,6 +17,6 @@ Route::get('/', function () {
     return 'api ok';
 });
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::apiResources([
+    'orders' => 'OrderController',
+]);
