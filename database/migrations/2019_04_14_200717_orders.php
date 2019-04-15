@@ -18,15 +18,18 @@ class Orders extends Migration
 
             $table->integer('user_id');
             $table->integer('tariff_id');
+            $table->integer('location_id');
 
+            $table->text('address');
             $table->timestamps();
-
             $table->timestamp('started_at');
             $table->timestamp('ended_at');
 
             $table->foreign('user_id')->references('id')->on('users')
                 ->onDelete('cascade')->onUpdate('cascade');
-            $table->foreign('tariff_id')->references('id')->on('TariffsSeeder')
+            $table->foreign('tariff_id')->references('id')->on('tariffs')
+                ->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('location_id')->references('id')->on('locations')
                 ->onDelete('cascade')->onUpdate('cascade');
         });
     }

@@ -13,8 +13,11 @@ class TariffResource extends Resource
     public function toArray($request)
     {
         return [
-            'id'            => $this->id,
-            'params'          => $this->params,
+            'id'        => $this->id,
+            'name'      => $this->name,
+            'locations' => $this->locations, // TODO Ресурсы для локаций
+            'duration'  => $this->duration,
+            'price'     => $this->price,
         ];
     }
 }

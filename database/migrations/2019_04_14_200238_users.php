@@ -18,7 +18,6 @@ class Users extends Migration
 
             $table->text('name')->nullable();
             $table->text('phone')->unique();
-
             $table->timestamps();
         });
     }

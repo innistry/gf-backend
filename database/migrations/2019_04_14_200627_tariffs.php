@@ -16,8 +16,9 @@ class Tariffs extends Migration
         Schema::create('tariffs', function (Blueprint $table) {
             $table->increments('id');
 
-            $table->jsonb('params')->nullable();
-
+            $table->text('name');
+            $table->float('price');
+            $table->integer('duration');
             $table->timestamps();
         });
     }

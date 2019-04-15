@@ -7,15 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 class Tariff extends Model
 {
     protected $fillable = [
-        'params',
+        'name', 'duration', 'price',
     ];
 
     protected $casts = [
-        'params' => 'collection',
+        'price' => 'float',
     ];
 
     public function locations()
     {
-        return $this->belongsToMany(Location::class);
+        return $this->belongsToMany(Location::class, 'tariffs_locations');
     }
 }

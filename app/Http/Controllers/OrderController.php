@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Order;
 use App\Models\User;
+use App\Models\Tariff;
 use Illuminate\Http\Request;
 use App\Http\Resources\OrderCollection;
 use App\Http\Resources\OrderResource;
@@ -20,8 +22,16 @@ class OrderController extends Controller
         $request->validate([
             'name' => 'required|string|max:200',
             'phone' => 'required|string',
-            'tariff_id' => 'required|integer',
+
+            'tariff_id' => 'required|integer|exists:tariffs,id',
+
+            'started_at' => 'required|date',
+
+            'location_id' => 'required|integer|exists:locations,id',
+            'address' => 'required|string',
         ]);
+
+        // TODO Вынести логику в какой-нибудь сервис
 
         $order = \DB::transaction(function () use ($request) {
             $phone = $request->phone; // TODO нормализация телефона
@@ -39,15 +49,17 @@ class OrderController extends Controller
                 ]);
             }
 
-            $tariff = \App\Models\Tariff::find($request->tariff_id);
+            $tariff = Tariff::findOrFail($request->tariff_id);
 
-            $started_at = now()->addDay(random_int(0, 20));
+            $started_at = Carbon::parse($request->started_at);
 
             return Order::create([
                 'user_id' => $user->id,
                 'tariff_id' => $tariff->id,
+                'location_id' => $request->location_id,
+                'address' => $request->address,
                 'started_at' => $started_at,
-                'ended_at' => $started_at->addDay(7),
+                'ended_at' => $started_at->copy()->addDay($tariff->duration),
             ]);
         });
 

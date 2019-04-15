@@ -17,6 +17,7 @@ class Locations extends Migration
             $table->increments('id');
 
             $table->text('city');
+            $table->timestamps();
         });
     }
 
