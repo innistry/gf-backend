@@ -20,3 +20,5 @@ Route::get('/', function () {
 Route::apiResources([
     'orders' => 'OrderController',
 ]);
+
+Route::get('tariffs', 'TariffController@index');

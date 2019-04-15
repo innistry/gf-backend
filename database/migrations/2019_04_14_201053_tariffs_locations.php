@@ -17,7 +17,7 @@ class TariffsLocations extends Migration
             $table->integer('tariff_id');
             $table->integer('location_id');
 
-            $table->foreign('tariff_id')->references('id')->on('tariffs')
+            $table->foreign('tariff_id')->references('id')->on('TariffsSeeder')
                 ->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('location_id')->references('id')->on('locations')
                 ->onDelete('cascade')->onUpdate('cascade');

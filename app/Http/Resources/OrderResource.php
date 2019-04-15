@@ -15,6 +15,7 @@ class OrderResource extends Resource
         return [
             'id'            => $this->id,
             'user'          => $this->user,
+            'tariff'        => TariffResource::make($this->tariff),
             'started_at'    => $this->started_at,
             'ended_at'      => $this->ended_at,
             'created_at'    => $this->created_at,

@@ -12,7 +12,7 @@ class OrderController extends Controller
 {
     public function index(): OrderCollection
     {
-        return new OrderCollection(Order::all());
+        return new OrderCollection(Order::query()->orderBy('id', 'desc')->get());
     }
 
     public function store(Request $request): OrderResource
@@ -39,9 +39,16 @@ class OrderController extends Controller
                 ]);
             }
 
-            $order = Order::create();
+            $tariff = \App\Models\Tariff::find($request->tariff_id);
 
-            return $order->user()->associate($user);
+            $started_at = now()->addDay(random_int(0, 20));
+
+            return Order::create([
+                'user_id' => $user->id,
+                'tariff_id' => $tariff->id,
+                'started_at' => $started_at,
+                'ended_at' => $started_at->addDay(7),
+            ]);
         });
 
         return OrderResource::make($order)

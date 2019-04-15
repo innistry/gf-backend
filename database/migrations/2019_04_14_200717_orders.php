@@ -26,7 +26,7 @@ class Orders extends Migration
 
             $table->foreign('user_id')->references('id')->on('users')
                 ->onDelete('cascade')->onUpdate('cascade');
-            $table->foreign('tariff_id')->references('id')->on('tariffs')
+            $table->foreign('tariff_id')->references('id')->on('TariffsSeeder')
                 ->onDelete('cascade')->onUpdate('cascade');
         });
     }
