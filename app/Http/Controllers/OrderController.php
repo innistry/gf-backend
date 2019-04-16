@@ -36,6 +36,8 @@ class OrderController extends Controller
         $order = \DB::transaction(function () use ($request) {
             $phone = $request->phone; // TODO нормализация телефона
 
+            \DB::raw('LOCK TABLE users');
+
             $user = User::where('phone', $phone)->first();
 
             if (!$user) {
