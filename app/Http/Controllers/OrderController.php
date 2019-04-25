@@ -4,19 +4,27 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use App\Models\Order;
-use App\Models\User;
 use App\Models\Tariff;
+use App\Services\UserService;
+use App\Services\OrderService;
 use Illuminate\Http\Request;
 use App\Http\Resources\OrderCollection;
 use App\Http\Resources\OrderResource;
 
 class OrderController extends Controller
 {
+    /**
+     * @return OrderCollection
+     */
     public function index(): OrderCollection
     {
         return new OrderCollection(Order::query()->orderBy('id', 'desc')->get());
     }
 
+    /**
+     * @param Request $request
+     * @return OrderResource
+     */
     public function store(Request $request): OrderResource
     {
         $request->validate([
@@ -31,38 +39,19 @@ class OrderController extends Controller
             'address' => 'required|string',
         ]);
 
-        // TODO Вынести логику в какой-нибудь сервис
+        $userService = new UserService();
 
-        $order = \DB::transaction(function () use ($request) {
-            $phone = $request->phone; // TODO нормализация телефона
+        $order = \DB::transaction(function () use ($request, $userService) {
 
-            \DB::raw('LOCK TABLE users');
+            $user = $userService->getOrCreate($request->phone, $request->name);
 
-            $user = User::where('phone', $phone)->first();
+            $orderService = new OrderService($user);
 
-            if (!$user) {
-                $user = User::create([
-                    'phone' => $phone,
-                    'name' => $request->name,
-                ]);
-            } elseif ($user->name != $request->name) {
-                $user->update([
-                    'name' => $request->name,
-                ]);
-            }
-
-            $tariff = Tariff::findOrFail($request->tariff_id);
-
-            $started_at = Carbon::parse($request->started_at);
-
-            return Order::create([
-                'user_id' => $user->id,
-                'tariff_id' => $tariff->id,
-                'location_id' => $request->location_id,
-                'address' => $request->address,
-                'started_at' => $started_at,
-                'ended_at' => $started_at->copy()->addDay($tariff->duration),
-            ]);
+            return $orderService->saveOrder(
+                Tariff::findOrFail($request->tariff_id),
+                $request->location_id,
+                $request->address,
+                Carbon::parse($request->started_at));
         });
 
         return OrderResource::make($order)
@@ -70,16 +59,27 @@ class OrderController extends Controller
             ->withLocation(route('orders.show', $order->id));
     }
 
+    /**
+     * @param string $id
+     * @return OrderResource
+     */
     public function show(string $id): OrderResource
     {
         return OrderResource::make(Order::findOrFail($id));
     }
 
+    /**
+     *
+     */
     public function update()
     {
         abort(404);
     }
 
+    /**
+     * @param string $id
+     * @return \Illuminate\Http\Response
+     */
     public function destroy(string $id)
     {
         $order = Order::findOrFail($id);
